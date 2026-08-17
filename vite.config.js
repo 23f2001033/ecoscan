@@ -11,7 +11,9 @@ function apiRoutes(env) {
       server.middlewares.use('/api/identify', async (req, res) => {
         // The handler reads the key from process.env; in dev that comes from .env via
         // loadEnv, which (unlike import.meta.env) never reaches the client bundle.
-        process.env.GROQ_API_KEY = env.GROQ_API_KEY
+        // Guard the assignment: process.env stringifies values, so setting it from an
+        // absent var yields the truthy string "undefined" and defeats the missing-key check.
+        if (env.GROQ_API_KEY) process.env.GROQ_API_KEY = env.GROQ_API_KEY
 
         const send = (status, payload) => {
           res.statusCode = status
