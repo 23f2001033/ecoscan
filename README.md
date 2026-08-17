@@ -5,7 +5,7 @@
 Built for **OregonHacks 2026** — *"technology that helps people reconnect with nature or supports
 environmental health."*
 
-🔗 **[Live demo — ecoscan-oregon.vercel.app](https://ecoscan-oregon.vercel.app)** · 🎥 **[Demo video](#)**
+🔗 **[Live demo — ecoscan-oregon.vercel.app](https://ecoscan-oregon.vercel.app)** · 🎥 **[Demo video](https://youtu.be/5oYIJvWcMqU)**
 
 ---
 
