@@ -5,12 +5,19 @@
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-// Maverick has the strongest vision quality on Groq; Scout is the fallback if the
-// primary is rate-limited or retired.
+// Vision-capable models on Groq, in preference order. Availability varies by account,
+// so we fall through the list rather than assuming any one is enabled.
 const MODELS = [
+  'qwen/qwen3.6-27b',
   'meta-llama/llama-4-maverick-17b-128e-instruct',
   'meta-llama/llama-4-scout-17b-16e-instruct',
 ];
+
+// Groq bills prompt + reserved max_tokens against the tokens-per-minute quota, and the
+// free tier allows only 8000 TPM. Keeping this tight is what makes repeated scans work
+// during a demo. reasoning_effort 'none' suppresses Qwen's thinking trace, which would
+// otherwise consume most of the budget before any JSON is emitted.
+const MAX_OUTPUT_TOKENS = 1200;
 
 // Vercel caps serverless request bodies at ~4.5MB. Base64 inflates bytes by ~33%,
 // so we reject early with a useful message rather than letting the platform 413.
@@ -47,7 +54,9 @@ async function callGroq(model, apiKey, dataUrl) {
     body: JSON.stringify({
       model,
       temperature: 0.2,
-      max_tokens: 700,
+      max_tokens: MAX_OUTPUT_TOKENS,
+      // Only Qwen exposes a thinking trace worth suppressing; other models reject the param.
+      ...(model.startsWith('qwen/') ? { reasoning_effort: 'none' } : {}),
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -143,11 +152,14 @@ export default async function handler(req, res) {
       return;
     } catch (error) {
       lastError = error;
-      // A 4xx that isn't rate limiting means the request itself is bad — retrying on
-      // another model will fail identically, so stop here.
-      if (error.status && error.status !== 429 && error.status < 500) {
-        break;
-      }
+
+      // 404 means the model isn't enabled on this account and 429 means it's saturated;
+      // both are worth trying on the next model. A 400/401/413 is our own request being
+      // malformed and will fail identically everywhere, so stop.
+      const worthRetrying =
+        !error.status || error.status === 404 || error.status === 429 || error.status >= 500;
+
+      if (!worthRetrying) break;
     }
   }
 

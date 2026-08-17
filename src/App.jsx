@@ -1,19 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { lookupSpecies, speciesCount } from './plantData';
 import { HISTORY_KEY, LOW_CONFIDENCE, MAX_FILE_BYTES } from './constants';
+import { downscaleToDataUrl } from './imageUtils';
 import UploadZone from './components/UploadZone';
 import ResultCard from './components/ResultCard';
 
 const SAMPLE_IMAGE = '/samples/sample-1.jpg';
-
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('Could not read that file.'));
-    reader.readAsDataURL(file);
-  });
-}
 
 function loadHistory() {
   try {
@@ -52,12 +44,14 @@ function App() {
     }
 
     if (file.size > MAX_FILE_BYTES) {
-      setError('That photo is larger than 2.5MB. Please choose a smaller one.');
+      setError('That photo is too large to process. Please choose one under 15MB.');
       return;
     }
 
     try {
-      setImagePreview(await readFileAsDataUrl(file));
+      // Downscale immediately so both the preview and the API request use the small
+      // version — no need to hold a 5MB data URL in state.
+      setImagePreview(await downscaleToDataUrl(file));
       reset();
     } catch {
       setError('Could not read that file. Please try another photo.');

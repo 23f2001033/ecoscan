@@ -154,6 +154,17 @@ export const plantDatabase = {
       'No removal needed. Mature cedars are increasingly stressed by drought — keep the root zone undisturbed and unpaved.',
     source: 'OSU Extension — PNW Native Plants',
   },
+  'rubus ursinus': {
+    name: 'Trailing Blackberry',
+    scientificName: 'Rubus ursinus',
+    status: 'Native',
+    impactScore: 1,
+    description:
+      'Oregon’s only native blackberry. Low, trailing vines feed birds and small mammals without forming the smothering thickets its invasive relatives do.',
+    removalInstructions:
+      'No removal needed — but check carefully before pulling any blackberry. Native trailing blackberry has three narrow, pointed leaflets and slender round stems. Invasive Himalayan blackberry has five broad, rounded leaflets, thick ridged canes, and white-felted leaf undersides.',
+    source: 'OSU Extension — PNW Native Plants',
+  },
   'gaultheria shallon': {
     name: 'Salal',
     scientificName: 'Gaultheria shallon',
