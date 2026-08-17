@@ -5,7 +5,7 @@
 Built for **OregonHacks 2026** — *"technology that helps people reconnect with nature or supports
 environmental health."*
 
-🔗 **[Live demo](#)** · 🎥 **[Demo video](#)**
+🔗 **[Live demo — ecoscan-oregon.vercel.app](https://ecoscan-oregon.vercel.app)** · 🎥 **[Demo video](#)**
 
 ---
 
@@ -102,7 +102,12 @@ Treated as a requirement, not a polish pass:
 
 ## Tech stack
 
-React 19 · Vite 8 · Tailwind CSS · Vercel serverless functions · Groq (`llama-4-maverick-17b-128e-instruct`)
+React 19 · Vite 8 · Tailwind CSS · Vercel serverless functions · Groq (`qwen/qwen3.6-27b` vision)
+
+Photos are downscaled to 768px in the browser before upload. That cuts latency, and it keeps each
+scan inside Groq's free-tier budget of 8,000 tokens per minute — the reserved output allowance counts
+against that quota too, so both the image and the response cap are kept deliberately small. Typical
+round trip is **under two seconds**.
 
 ## Running locally
 
